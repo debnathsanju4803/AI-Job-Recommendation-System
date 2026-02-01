@@ -19,7 +19,9 @@ class JobMatcher:
     """Match and rank jobs for a resume"""
     
     def __init__(self):
-        self.embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL)
+        # Force CPU usage if configured
+        device = None if settings.FORCE_CPU else None
+        self.embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL, device=device)
     
     def calculate_semantic_similarity(self, resume_text: str, job_text: str) -> float:
         """Calculate semantic similarity between resume and job"""

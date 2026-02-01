@@ -156,11 +156,11 @@ class JobScraper:
     def search_all_sources(self, query: str, location: Optional[str] = None) -> List[Dict[str, Any]]:
         """Search all configured sources (free APIs only)"""
         all_jobs = []
-        if "arbeitnow" in settings.JOB_SOURCES:
+        if "arbeitnow" in settings.get_job_sources():
             all_jobs.extend(self.search_arbeitnow(query, location))
-        if "remoteok" in settings.JOB_SOURCES:
+        if "remoteok" in settings.get_job_sources():
             all_jobs.extend(self.search_remoteok(query))
-        if "indeed" in settings.JOB_SOURCES:
+        if "indeed" in settings.get_job_sources():
             all_jobs.extend(self.search_indeed_rss(query, location or "USA"))
         
         # Deduplicate by title and company

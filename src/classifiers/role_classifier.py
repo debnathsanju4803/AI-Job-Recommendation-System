@@ -18,7 +18,9 @@ class RoleClassifier:
     """Classify resumes into job roles using semantic similarity"""
     
     def __init__(self):
-        self.embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL)
+        # Force CPU usage if configured
+        device = None if settings.FORCE_CPU else None
+        self.embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL, device=device)
         self.roles = self._load_roles()
         self.role_embeddings = self._create_role_embeddings()
     

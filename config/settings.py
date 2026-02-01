@@ -3,9 +3,9 @@ Configuration settings for the application
 """
 import os
 from pathlib import Path
-from typing import Optional, Union
-from pydantic_settings import BaseSettings
-from pydantic import field_validator
+from typing import Optional, Union, Dict, Any
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator, Field
 
 class Settings(BaseSettings):
     """Application settings"""
@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     HF_MODEL: str = "microsoft/Phi-3-mini-4k-instruct"
     HF_DEVICE: str = "cpu"  # or cuda if GPU available
     
+    # Force CPU usage for all models
+    FORCE_CPU: bool = True
+    
     # Vector Database Settings (Chroma - free, local)
     VECTOR_DB_PROVIDER: str = "chroma"  # Options: chroma, qdrant
     CHROMA_PERSIST_DIR: str = str(DATA_DIR / "chroma_db")
@@ -39,7 +42,7 @@ class Settings(BaseSettings):
     
     # Job Search Settings
     MAX_JOBS_PER_SEARCH: int = 50
-    JOB_SOURCES: list = ["arbeitnow", "remoteok", "indeed"]  # Free sources (github deprecated)
+    JOB_SOURCES: str = "arbeitnow,remoteok,indeed"  # Free sources (github deprecated)
     
     # Scraping Settings
     SCRAPING_DELAY: float = 1.0  # Delay between requests (seconds)
@@ -60,22 +63,23 @@ class Settings(BaseSettings):
     REDIS_PORT: int = 6379
     REDIS_TTL: int = 3600  # 1 hour
     
-    @field_validator("JOB_SOURCES", mode="before")
-    @classmethod
-    def parse_job_sources(cls, v: Union[str, list]) -> list:
-        if isinstance(v, str):
-            return [s.strip() for s in v.split(",") if s.strip()]
-        return v
-    
     @field_validator("DATA_DIR", mode="after")
     @classmethod
     def ensure_data_dir(cls, v: Path) -> Path:
         v.mkdir(parents=True, exist_ok=True)
         return v
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        env_parse_none_str="null"
+    )
+    
+    def get_job_sources(self) -> list:
+        """Get job sources as a list"""
+        if isinstance(self.JOB_SOURCES, str):
+            return [s.strip() for s in self.JOB_SOURCES.split(",") if s.strip()]
+        return self.JOB_SOURCES
 
 # Global settings instance
 settings = Settings()
