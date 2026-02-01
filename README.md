@@ -21,6 +21,8 @@ A free, open-source, production-ready system for parsing resumes and recommendin
 - **API**: FastAPI
 - **PDF Processing**: PyMuPDF
 - **Web Scraping**: BeautifulSoup, Requests
+- **Caching**: Redis (response caching and rate limiting)
+- **Rate Limiting**: SlowAPI with Redis backend
 
 ## 📋 Prerequisites
 
@@ -120,12 +122,19 @@ python scripts/ingest_jobs.py
 docker-compose up -d
 ```
 
-2. **Pull Ollama model** (in Ollama container):
+2. **Wait for Redis to be ready**:
+```bash
+# Check Redis status
+docker-compose logs redis
+# Should see "Ready to accept connections"
+```
+
+3. **Pull Ollama model** (in Ollama container):
 ```bash
 docker exec -it resume_parser_ollama ollama pull llama3.1:8b
 ```
 
-3. **Ingest jobs**:
+4. **Ingest jobs**:
 ```bash
 docker exec -it resume_parser_api python scripts/ingest_jobs.py
 ```
@@ -281,7 +290,14 @@ Edit `data/roles.json` or it will be auto-created with defaults.
 docker-compose up -d
 ```
 
-2. Check logs:
+2. Wait for all services to be ready:
+```bash
+# Check service status
+docker-compose ps
+# All services should show "Up"
+```
+
+3. Check logs:
 ```bash
 docker-compose logs -f api
 ```

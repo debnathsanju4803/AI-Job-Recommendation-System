@@ -57,6 +57,13 @@ AI-Job-Recommendation-System/
 │   ├── setup.sh                 # Setup script
 │   └── verify_setup.py          # Setup verification script
 │
+├── docker/                       # Docker configuration
+│   ├── Dockerfile               # Main application Dockerfile
+│   ├── docker-compose.yml       # Development Docker Compose
+│   ├── docker-compose.prod.yml  # Production Docker Compose
+│   └── redis/                   # Redis configuration
+│       └── redis.conf           # Redis configuration file
+│
 ├── tests/                        # Tests
 │   ├── __init__.py
 │   ├── test_complete.py         # Comprehensive test suite
@@ -403,7 +410,6 @@ ufw deny 11434      # Block Ollama from external access
 - Vector DB can handle millions of jobs
 - API can be scaled horizontally
 - LLM can be run on GPU for faster inference
-- Can add Redis for caching
 
 ## Security
 
