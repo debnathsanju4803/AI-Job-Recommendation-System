@@ -1,4 +1,4 @@
-# AI Resume Parser & Job Recommender
+# AI Job Recommendation System
 
 A free, open-source, production-ready system for parsing resumes and recommending matching jobs using AI. Built with **100% free and open-source** technologies - no paid APIs required.
 
@@ -6,7 +6,7 @@ A free, open-source, production-ready system for parsing resumes and recommendin
 
 - **Resume Parsing**: Extract structured data from PDF, DOCX, and text resumes using free LLM models (Ollama or HuggingFace)
 - **Job Role Classification**: Automatically classify resumes into job roles using semantic similarity
-- **Job Search**: Search jobs from multiple free sources (GitHub Jobs, RemoteOK, Indeed RSS)
+- **Job Search**: Search jobs from multiple free sources (Arbeitnow, RemoteOK, Indeed RSS)
 - **Vector Database**: Fast semantic job matching using Chroma (free, local vector database)
 - **Multi-Factor Scoring**: Rank jobs based on semantic similarity, skills match, and experience level
 - **REST API**: FastAPI-based REST API for easy integration
@@ -28,6 +28,56 @@ A free, open-source, production-ready system for parsing resumes and recommendin
 - Docker & Docker Compose (optional, for containerized deployment)
 - Ollama (optional, for local LLM - recommended)
 
+## 🔄 System Workflow
+
+### End-to-End Process
+
+```mermaid
+graph TD
+    A[Resume Upload] --> B[Resume Parsing]
+    B --> C[Job Role Classification]
+    C --> D[Job Search & Retrieval]
+    D --> E[Job Matching & Ranking]
+    E --> F[Recommendations]
+    
+    B --> G[Extract: Skills, Experience, Education]
+    C --> H[Semantic Similarity Analysis]
+    D --> I[Vector DB Search + Web Scraping]
+    E --> J[Multi-Factor Scoring]
+    
+    G --> K[Structured Resume Data]
+    H --> L[Job Role Prediction]
+    I --> M[Job Candidates]
+    J --> N[Ranked Job List]
+```
+
+### Detailed Workflow
+
+1. **Resume Processing**
+   - Upload PDF/DOCX/text resume
+   - Extract structured data using LLM
+   - Parse skills, experience, education, contact info
+
+2. **Job Role Classification**
+   - Analyze resume content semantically
+   - Match against known job roles
+   - Determine most suitable job categories
+
+3. **Job Search**
+   - Query vector database for similar jobs
+   - Scrape fresh listings from job boards
+   - Deduplicate and filter results
+
+4. **Job Matching**
+   - Calculate semantic similarity scores
+   - Match skills and experience requirements
+   - Rank jobs by overall fit
+
+5. **Recommendations**
+   - Return top-k matching jobs
+   - Include detailed scoring breakdown
+   - Provide job descriptions and requirements
+
 ## 🚀 Quick Start
 
 ### Option 1: Local Setup
@@ -35,7 +85,7 @@ A free, open-source, production-ready system for parsing resumes and recommendin
 1. **Clone and setup**:
 ```bash
 git clone <repository-url>
-cd AI-RESUME-PARSER-JOB-RECOMMEDER
+cd AI-Job-Recommendation-System
 ./scripts/setup.sh
 ```
 
@@ -80,6 +130,24 @@ docker exec -it resume_parser_ollama ollama pull llama3.1:8b
 docker exec -it resume_parser_api python scripts/ingest_jobs.py
 ```
 
+### Option 3: Production Deployment
+
+1. **Build Docker images**:
+```bash
+docker-compose -f docker-compose.prod.yml build
+```
+
+2. **Deploy**:
+```bash
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+3. **Setup monitoring** (optional):
+```bash
+# Add Prometheus/Grafana for monitoring
+docker-compose -f docker-compose.monitoring.yml up -d
+```
+
 ## 📖 API Usage
 
 ### Health Check
@@ -116,7 +184,7 @@ curl -X POST "http://localhost:8000/api/ingest-jobs" \
         "title": "Backend Developer",
         "company": "Tech Corp",
         "description": "...",
-        "source": "github"
+        "source": "arbeitnow"
       }
     ]
   }'
@@ -178,7 +246,7 @@ CHROMA_PERSIST_DIR=./data/chroma_db
 
 Configure which sources to use:
 ```env
-JOB_SOURCES=github,remoteok,indeed
+JOB_SOURCES=arbeitnow,remoteok,indeed
 ```
 
 ## 🔧 Development
