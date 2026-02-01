@@ -1,7 +1,7 @@
 """
 FastAPI application for resume parser and job recommender
 """
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -13,6 +13,11 @@ import shutil
 from config.settings import settings
 from src.pipeline import ResumeJobPipeline
 from src.utils.logger import logger
+
+# Import rate limiting
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.middleware import SlowAPIMiddleware
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -30,8 +35,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Rate limiting
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
+
 # Initialize pipeline
 pipeline = ResumeJobPipeline()
+
+# Setup caching with Redis
+@app.on_event("startup")
+async def startup():
+    if settings.REDIS_HOST:
+        redis_backend = RedisBackend(f"{settings.REDIS_HOST}:{settings.REDIS_PORT}")
+        FastAPICache.init(redis_backend, prefix="resume-parser-cache")
 
 # Request/Response models
 class ResumeTextRequest(BaseModel):
@@ -67,7 +84,9 @@ async def health():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/parse-resume-file")
+@limiter.limit("10/minute")
 async def parse_resume_file(
+    request: Request,
     file: UploadFile = File(...),
     top_k: int = 10,
     use_vector_db: bool = True
@@ -93,13 +112,14 @@ async def parse_resume_file(
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/parse-resume-text")
-async def parse_resume_text(request: ResumeTextRequest):
+@limiter.limit("20/minute")
+async def parse_resume_text(request: Request, request_body: ResumeTextRequest):
     """Parse resume from text"""
     try:
         result = pipeline.process_resume_text(
-            request.resume_text,
-            request.top_k,
-            request.use_vector_db
+            request_body.resume_text,
+            request_body.top_k,
+            request_body.use_vector_db
         )
         return JSONResponse(content=result)
     except Exception as e:
@@ -107,11 +127,12 @@ async def parse_resume_text(request: ResumeTextRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/ingest-jobs")
-async def ingest_jobs(request: JobIngestRequest):
+@limiter.limit("5/minute")
+async def ingest_jobs(request: Request, request_body: JobIngestRequest):
     """Ingest jobs into vector database"""
     try:
-        pipeline.ingest_jobs(request.jobs)
-        return {"message": f"Successfully ingested {len(request.jobs)} jobs"}
+        pipeline.ingest_jobs(request_body.jobs)
+        return {"message": f"Successfully ingested {len(request_body.jobs)} jobs"}
     except Exception as e:
         logger.error(f"Error ingesting jobs: {e}")
         raise HTTPException(status_code=500, detail=str(e))

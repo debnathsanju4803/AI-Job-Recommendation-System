@@ -62,6 +62,7 @@ class Settings(BaseSettings):
     REDIS_HOST: Optional[str] = None
     REDIS_PORT: int = 6379
     REDIS_TTL: int = 3600  # 1 hour
+    REDIS_URL: str = "redis://localhost:6379"
     
     @field_validator("DATA_DIR", mode="after")
     @classmethod

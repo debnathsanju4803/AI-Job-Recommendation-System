@@ -33,3 +33,5 @@ services:
 
 volumes:
   ollama_data:
+
+  redis_data:
