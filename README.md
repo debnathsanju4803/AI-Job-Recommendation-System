@@ -70,21 +70,21 @@ cp .env.example .env
 
 ```mermaid
 flowchart TD
-    A[📤 User Upload Resume] --> B[📄 Extract Text<br/>(PyMuPDF)]
-    B --> C[🤖 Parse Resume<br/>(Regex + LLM)]
-    C --> D[🎯 Generate Embeddings<br/>(Sentence Transformers)]
+    A[📤 User Upload Resume] --> B[📄 Extract Text]
+    B --> C[🤖 Parse Resume]
+    C --> D[🎯 Generate Embeddings]
     
-    D --> E[🔍 Compare with Roles<br/>(Job Role DB)]
-    E --> F[📊 Get Top Roles<br/>(Similarity Score)]
+    D --> E[🔍 Compare with Roles]
+    E --> F[📊 Get Top Roles]
     
-    F --> G[🌐 Scrape Jobs<br/>(Web Scraping)]
-    G --> H[💾 Store in Vector DB<br/>(Chroma)]
-    H --> I[🔍 Find Similar Jobs<br/>(Vector Search)]
+    F --> G[🌐 Scrape Jobs]
+    G --> H[💾 Store in Vector DB]
+    H --> I[🔍 Find Similar Jobs]
     
-    I --> J[📊 Multi-Factor Scoring<br/>(Skills + Experience + Match)]
-    J --> K[📈 Rank Jobs<br/>(Relevance Score)]
+    I --> J[📊 Multi-Factor Scoring]
+    J --> K[📈 Rank Jobs]
     
-    K --> L[📱 Frontend Display<br/>(React Dashboard)]
+    K --> L[📱 Frontend Display]
     
     style A fill:#e1f5fe
     style L fill:#f3e5f5
