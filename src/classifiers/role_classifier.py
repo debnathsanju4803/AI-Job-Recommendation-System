@@ -19,7 +19,7 @@ class RoleClassifier:
     
     def __init__(self):
         # Force CPU usage if configured
-        device = None if settings.FORCE_CPU else None
+        device = "cpu" if settings.FORCE_CPU else None
         self.embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL, device=device)
         self.roles = self._load_roles()
         self.role_embeddings = self._create_role_embeddings()

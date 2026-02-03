@@ -1,0 +1,14 @@
+{
+  "results": {
+    "imports": true,
+    "classifier": true,
+    "vector_db": true,
+    "job_matcher": true,
+    "simple_parser": true,
+    "job_scraper": true,
+    "pipeline": true
+  },
+  "passed": 7,
+  "total": 7,
+  "time": 40.69343137741089
+}
