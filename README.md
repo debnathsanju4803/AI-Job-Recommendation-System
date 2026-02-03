@@ -86,18 +86,18 @@ flowchart TD
     
     K --> L[📱 Frontend Display]
     
-    style A fill:#e3f2fd
-    style B fill:#e3f2fd
-    style C fill:#e3f2fd
-    style D fill:#e3f2fd
-    style E fill:#e3f2fd
-    style F fill:#e3f2fd
-    style G fill:#e3f2fd
-    style H fill:#e3f2fd
-    style I fill:#e3f2fd
-    style J fill:#e3f2fd
-    style K fill:#e3f2fd
-    style L fill:#e3f2fd
+    style A fill:#1976d2
+    style B fill:#1976d2
+    style C fill:#1976d2
+    style D fill:#1976d2
+    style E fill:#1976d2
+    style F fill:#1976d2
+    style G fill:#1976d2
+    style H fill:#1976d2
+    style I fill:#1976d2
+    style J fill:#1976d2
+    style K fill:#1976d2
+    style L fill:#1976d2
 ```
 
 ### 📋 **Processing Flow:**
