@@ -1,6 +1,6 @@
 # AI Job Recommendation System
 
-A free, open-source system for parsing resumes and recommending matching jobs using AI. Built with **100% free and open-source** technologies.
+A modern, free, and open-source system for parsing resumes and recommending matching jobs using AI. Built with **100% free and open-source** technologies.
 
 ## 🚀 Features
 
@@ -9,23 +9,33 @@ A free, open-source system for parsing resumes and recommending matching jobs us
 - **Job Search**: Search jobs from multiple sources with web scraping
 - **Vector Database**: Fast semantic job matching using Chroma
 - **Multi-Factor Scoring**: Rank jobs based on skills, experience, and semantic similarity
-- **REST API**: FastAPI-based REST API
+- **Modern Frontend**: React + TypeScript + Material-UI
 - **Docker Support**: Ready for deployment
 
 ## 🛠️ Technology Stack
 
+### Backend (Python)
+- **API**: FastAPI
 - **LLM**: Ollama (local) or HuggingFace Transformers
 - **Vector DB**: Chroma (local, persistent)
 - **Embeddings**: Sentence Transformers
-- **API**: FastAPI
 - **PDF Processing**: PyMuPDF
 - **Web Scraping**: BeautifulSoup, Requests
 - **Caching**: Redis
 - **Rate Limiting**: SlowAPI
 
+### Frontend (React)
+- **Framework**: React 18 + TypeScript
+- **UI Library**: Material-UI (MUI)
+- **State Management**: Redux Toolkit
+- **Build Tool**: Vite
+- **Routing**: React Router DOM
+- **Styling**: CSS-in-JS with MUI
+
 ## 📋 Prerequisites
 
 - Python 3.11+
+- Node.js 18+ and npm
 - Docker & Docker Compose (optional)
 - Ollama (optional, for local LLM)
 
@@ -37,43 +47,59 @@ A free, open-source system for parsing resumes and recommending matching jobs us
 ```bash
 git clone <repository-url>
 cd AI-Job-Recommendation-System
-./scripts/setup.sh
 ```
 
-2. **Configure environment**:
+2. **Install dependencies**:
+```bash
+pip install -r requirements.txt
+cd frontend && npm install && cd ..
+```
+
+3. **Configure environment**:
 ```bash
 cp .env.example .env
 # Edit .env with your settings
 ```
 
-3. **Start Ollama** (if using Ollama):
+4. **Start system**:
 ```bash
-ollama serve
-ollama pull llama3.1:8b
+./start.sh
 ```
 
-4. **Run the API**:
-```bash
-source venv/bin/activate
-uvicorn src.api.main:app --reload
+## 🔄 System Workflow
+
+```mermaid
+flowchart TD
+    A[📤 User Upload Resume] --> B[📄 Extract Text<br/>(PyMuPDF)]
+    B --> C[🤖 Parse Resume<br/>(Regex + LLM)]
+    C --> D[🎯 Generate Embeddings<br/>(Sentence Transformers)]
+    
+    D --> E[🔍 Compare with Roles<br/>(Job Role DB)]
+    E --> F[📊 Get Top Roles<br/>(Similarity Score)]
+    
+    F --> G[🌐 Scrape Jobs<br/>(Web Scraping)]
+    G --> H[💾 Store in Vector DB<br/>(Chroma)]
+    H --> I[🔍 Find Similar Jobs<br/>(Vector Search)]
+    
+    I --> J[📊 Multi-Factor Scoring<br/>(Skills + Experience + Match)]
+    J --> K[📈 Rank Jobs<br/>(Relevance Score)]
+    
+    K --> L[📱 Frontend Display<br/>(React Dashboard)]
+    
+    style A fill:#e1f5fe
+    style L fill:#f3e5f5
+    style J fill:#fff3e0
+    style K fill:#e8f5e8
 ```
 
-### Docker Setup
+### 📋 **Processing Flow:**
 
-1. **Start services**:
-```bash
-docker-compose up -d
-```
-
-2. **Pull Ollama model**:
-```bash
-docker exec -it resume_parser_ollama ollama pull llama3.1:8b
-```
-
-3. **Ingest jobs**:
-```bash
-docker exec -it resume_parser_api python scripts/ingest_jobs.py
-```
+1. **📤 User Upload** → `POST /api/parse-resume-file`
+2. **📄 Backend Processing** → `extract_text()` → `parse_resume()` → `generate_embeddings()`
+3. **🤖 AI Analysis** → `classify_job_role()` → `find_matching_jobs()`
+4. **📊 Scoring Engine** → Multi-factor scoring algorithm
+5. **📈 Results** → Ranked job recommendations
+6. **📱 Frontend Display** → React dashboard with filters and details
 
 ## 📖 API Usage
 
@@ -82,26 +108,32 @@ docker exec -it resume_parser_api python scripts/ingest_jobs.py
 curl http://localhost:8000/health
 ```
 
-### Parse Resume from File
+### Parse Resume
 ```bash
+# From file
 curl -X POST "http://localhost:8000/api/parse-resume-file" \
-  -H "Content-Type: multipart/form-data" \
-  -F "file=@resume.pdf" \
-  -F "top_k=10"
-```
+  -F "file=@resume.pdf" -F "top_k=10"
 
-### Parse Resume from Text
-```bash
+# From text
 curl -X POST "http://localhost:8000/api/parse-resume-text" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "resume_text": "John Doe\nSoftware Engineer...",
-    "top_k": 10
-  }'
+  -d '{"resume_text": "John Doe\nSoftware Engineer...", "top_k": 10}'
 ```
 
 ### API Documentation
 Visit `http://localhost:8000/docs` for interactive API documentation.
+
+## 📖 Usage
+
+### Backend API
+- **API Documentation**: Visit `http://localhost:8000/docs`
+- **Health Check**: `curl http://localhost:8000/health`
+
+### Frontend Application
+- **Dashboard**: `http://localhost:3000` - Main application interface
+- **Authentication**: Login/Register system
+- **Resume Upload**: Upload and parse resumes
+- **Job Results**: View AI-generated job recommendations
+- **Job Database**: Browse available job listings
 
 ## 📁 Project Structure
 
@@ -154,16 +186,24 @@ CHROMA_PERSIST_DIR=./data/chroma_db
 
 ## 🚢 Deployment
 
-### Docker Deployment
+### Frontend Deployment (Cloudflare Pages)
 
-1. Build and run:
+1. **Build frontend**:
 ```bash
-docker-compose up -d
+cd frontend
+npm run build
 ```
 
-2. Check service status:
+2. **Deploy to Cloudflare Pages**:
+   - Connect your GitHub repository
+   - Set build command: `cd frontend && npm run build`
+   - Set build output directory: `frontend/dist`
+
+### Backend Deployment (Docker)
+
+1. **Build and run**:
 ```bash
-docker-compose ps
+docker-compose up -d
 ```
 
 ### Production Deployment
@@ -179,6 +219,7 @@ gunicorn src.api.main:app -w 4 -k uvicorn.workers.UvicornWorker
 - **Resume Parsing**: ~3-5 seconds
 - **Job Search**: <1 second (vector DB)
 - **Job Ranking**: ~0.5 seconds per job
+- **Frontend Build**: ~30 seconds
 - **End-to-End**: ~10-20 seconds
 
 ## 🔒 Security
@@ -205,6 +246,21 @@ MIT License
 - [Chroma](https://www.trychroma.com/) for vector database
 - [Sentence Transformers](https://www.sbert.net/) for embeddings
 - [FastAPI](https://fastapi.tiangolo.com/) for API framework
+
+## 🚀 Quick Links
+
+- **Backend API**: http://localhost:8000
+- **Frontend App**: http://localhost:3000
+- **API Docs**: http://localhost:8000/docs
+- **Startup Script**: `./start.sh`
+
+## 🎯 Key Benefits
+
+- **🚀 Modern Tech Stack**: React + TypeScript + FastAPI + Docker
+- **⚡ Fast Performance**: Vite build, vector database, optimized API
+- **🔒 Production Ready**: Authentication, security, deployment configs
+- **📱 Beautiful UI**: Modern Material-UI design with responsive layout
+- **📦 Easy Setup**: Single command startup with `./start.sh`
 
 ---
 
