@@ -125,7 +125,7 @@ async def parse_resume_file(request: Request, file: UploadFile = File(...), top_
             tmp_path = Path(tmp_file.name)
         
         try:
-            # Process resume
+            # Process resume using pipeline
             result = pipeline.process_resume(tmp_path, top_k, use_vector_db)
             return JSONResponse(content=result)
         finally:
@@ -141,6 +141,7 @@ async def parse_resume_file(request: Request, file: UploadFile = File(...), top_
 async def parse_resume_text(request: Request, request_body: ResumeTextRequest):
     """Parse resume from text"""
     try:
+        # Process resume using pipeline
         result = pipeline.process_resume_text(
             request_body.resume_text,
             request_body.top_k,
